@@ -1,6 +1,12 @@
 (function() {
   "use strict";
-  function AvengersController(avengers) {
+
+  angular.module('clean-code.avengers')
+    .controller('AvengersController', AvengersController);
+
+  AvengersController.$inject =['avengers', 'logger'];
+
+  function AvengersController(avengers, logger) {
     var vm = this;
     vm.avengers = [];
     vm.title = 'Avengers';
@@ -10,19 +16,15 @@
     function _init() {
       return getAvengers().then(function() {
         //do something
+        logger.info('Activated Avengers View');
       });
     }
 
     function getAvengers() {
-      avengers.getAvengers().then(function(data) {
+      return avengers.getAvengers().then(function(data) {
         vm.avengers = data;
         return vm.avengers;
       })
     }
   }
-
-  AvengersController.$inject =['avengers'];
-
-  angular.module('clean-code.avengers')
-    .controller('AvengersController', AvengersController)
 })();

@@ -3,9 +3,9 @@
   angular.module('clean-code.core')
     .factory('avengers', avengers);
 
-  avengers.$inject = ['rest', '$q'];
+  avengers.$inject = ['rest', '$q', 'exception', 'logger'];
 
-  function avengers(rest, $q) {
+  function avengers(rest, $q, exception, logger) {
     return {
       getAvengers: getAvengers,
       getAvengersCount: getAvengersCount,
@@ -20,12 +20,13 @@
       return rest(req)
         .then(getAvengersComplete)
         .catch(function(error) {
+          exception.catcher('XHR Failed for getAvengers', error);
           //show error, add redirection
         });
     }
 
     function getAvengersComplete(data) {
-      return data.data[0].data.result;
+      return data.data[0].data.results;
     }
 
     function getAvengersCount() {
@@ -35,6 +36,7 @@
         })
         .catch(function(error) {
           //hangle error
+          exception.catcher('XHR Failed for getAvengersCount')
         })
     }
 

@@ -5,6 +5,10 @@
     /*
      * Angular modules
      */
-    'ngAnimate', 'ui.router'
+    'ngAnimate', 'ui.router',
+    /*
+     Our reusable cross app code modules
+     */
+    'blocks.exception', 'blocks.logger'
   ])
 })();

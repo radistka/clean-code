@@ -1,7 +1,13 @@
 (function() {
   'use strict';
 
-  function DashboardController($q, avengers) {
+  angular
+    .module('clean-code.dashboard')
+    .controller('DashboardController', DashboardController);
+
+  DashboardController.$inject = ['$q', 'avengers', 'logger'];
+
+  function DashboardController($q, avengers, logger) {
     var vm = this;
     vm.news = {
       title: 'Marvel Avengers',
@@ -14,9 +20,10 @@
     _init();
 
     function _init() {
-      var promises = [getAvengersCast, getAvengersCount];
+      var promises = [getAvengersCast(), getAvengersCount()];
       return $q.all(promises).then(function() {
         //data is loaded;
+        logger.info('Activated Dashboard View');
       })
     }
 
@@ -34,9 +41,4 @@
       });
     }
   }
-
-  DashboardController.$inject = ['$q', 'avengers'];
-  angular
-    .module('clean-code.dashboard')
-    .controller('DashboardController', DashboardController);
 })();

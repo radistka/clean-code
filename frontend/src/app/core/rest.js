@@ -5,10 +5,12 @@
   angular.module('clean-code.core')
     .factory('rest', rest);
 
-  rest.$inject = ['$http'];
+  rest.$inject = ['$http', 'exception'];
 
-  function rest($http) {
-    function errorHandler(res) {}
+  function rest($http, exception) {
+    function errorHandler(res) {
+      exception.catcher('XHR Failed', res);
+    }
 
     return function (req) {
       req.headers = {};
