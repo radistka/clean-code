@@ -1,7 +1,13 @@
 'use strict';
 
 (function () {
-  function Rest($http) {
+
+  angular.module('clean-code.core')
+    .factory('rest', rest);
+
+  rest.$inject = ['$http'];
+
+  function rest($http) {
     function errorHandler(res) {}
 
     return function (req) {
@@ -12,9 +18,4 @@
       return promise;
     };
   }
-
-  Rest.$inject = ['$http'];
-
-  angular.module('clean-code.core')
-    .factory('rest', Rest);
 }());

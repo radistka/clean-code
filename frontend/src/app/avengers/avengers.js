@@ -15,7 +15,7 @@
 
     function getAvengers() {
       avengers.getAvengers().then(function(data) {
-        vm.avengers = data.data[0].data.results;
+        vm.avengers = data;
         return vm.avengers;
       })
     }

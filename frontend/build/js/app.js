@@ -63,7 +63,7 @@
 
     function getAvengers() {
       avengers.getAvengers().then(function(data) {
-        vm.avengers = data.data[0].data.results;
+        vm.avengers = data;
         return vm.avengers;
       })
     }
@@ -119,19 +119,41 @@
 
 (function() {
 
+  angular.module('clean-code.core')
+    .factory('avengers', avengers);
+
+  avengers.$inject = ['rest', '$q'];
+
   function avengers(rest, $q) {
+    return {
+      getAvengers: getAvengers,
+      getAvengersCount: getAvengersCount,
+      getAvengersCast: getAvengersCast
+    };
+
     function getAvengers() {
       var req = {
         method: 'GET',
         url: '/api/maa'
       };
-      return rest(req);
+      return rest(req)
+        .then(getAvengersComplete)
+        .catch(function(error) {
+          //show error, add redirection
+        });
+    }
+
+    function getAvengersComplete(data) {
+      return data.data[0].data.result;
     }
 
     function getAvengersCount() {
       return getAvengersCast()
         .then(function getAvengersCastComplete (data) {
           return data.length;
+        })
+        .catch(function(error) {
+          //hangle error
         })
     }
 
@@ -151,23 +173,19 @@
       ];
       return $q.when(cast);
     }
-
-    return {
-      getAvengers: getAvengers,
-      getAvengersCount: getAvengersCount,
-      getAvengersCast: getAvengersCast
-    }
   }
 
-  avengers.$inject = ['rest', '$q'];
-
-  angular.module('clean-code.core')
-    .factory('avengers', avengers)
 })();
 'use strict';
 
 (function () {
-  function Rest($http) {
+
+  angular.module('clean-code.core')
+    .factory('rest', rest);
+
+  rest.$inject = ['$http'];
+
+  function rest($http) {
     function errorHandler(res) {}
 
     return function (req) {
@@ -178,9 +196,4 @@
       return promise;
     };
   }
-
-  Rest.$inject = ['$http'];
-
-  angular.module('clean-code.core')
-    .factory('rest', Rest);
 }());
