@@ -1,19 +1,25 @@
 (function() {
   "use strict";
   function AvengersController(avengers) {
-    this._avengers = avengers;
-    this.avengers = [];
-    this.title = 'Avengers';
+    var vm = this;
+    vm.avengers = [];
+    vm.title = 'Avengers';
 
+    _init();
 
-    this._init();
+    function _init() {
+      return getAvengers().then(function() {
+        //do something
+      });
+    }
+
+    function getAvengers() {
+      avengers.getAvengers().then(function(data) {
+        vm.avengers = data.data[0].data.results;
+        return vm.avengers;
+      })
+    }
   }
-
-  AvengersController.prototype._init = function() {
-    this._avengers.getAvengers().then(function(data) {
-      this.avengers = data.data[0].data.results;
-    }.bind(this))
-  };
 
   AvengersController.$inject =['avengers'];
 

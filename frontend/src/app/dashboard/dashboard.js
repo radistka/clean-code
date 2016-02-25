@@ -1,31 +1,41 @@
 (function() {
   'use strict';
 
-  function DashboardController(avengers) {
-    this._avengers = avengers;
-    this.news = {
+  function DashboardController($q, avengers) {
+    var vm = this;
+    vm.news = {
       title: 'Marvel Avengers',
       description: 'Marvel Avengers 2 is now in production!'
     };
-    this.avengerCount = 0;
-    this.avengers = [];
-    this.title = 'Dashboard';
+    vm.avengerCount = 0;
+    vm.avengers = [];
+    vm.title = 'Dashboard';
 
-   this. _init();
+    _init();
 
+    function _init() {
+      var promises = [getAvengersCast, getAvengersCount];
+      return $q.all(promises).then(function() {
+        //data is loaded;
+      })
+    }
 
+    function getAvengersCount() {
+      return avengers.getAvengersCount().then(function(data) {
+        vm.avengerCount = data;
+        return vm.avengerCount;
+      });
+    }
+
+    function getAvengersCast() {
+      return avengers.getAvengersCast().then(function(data) {
+        vm.avengers = data;
+        return vm.avengers;
+      });
+    }
   }
 
-  DashboardController.prototype._init = function() {
-    this._avengers.getAvengersCount().then(function(data) {
-      this.avengerCount = data;
-    }.bind(this));
-
-    this._avengers.getAvengersCast().then(function(data) {
-      this.avengers = data;
-    }.bind(this));
-  };
-  DashboardController.$inject = ['avengers'];
+  DashboardController.$inject = ['$q', 'avengers'];
   angular
     .module('clean-code.dashboard')
     .controller('DashboardController', DashboardController);

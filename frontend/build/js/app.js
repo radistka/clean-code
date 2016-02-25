@@ -14,16 +14,6 @@
   });
 })();
 (function() {
-  "use strict";
-
-  angular.module('clean-code.core', [
-    /*
-     * Angular modules
-     */
-    'ngAnimate', 'ui.router'
-  ])
-})();
-(function() {
   'use strict';
 
   var dashboard = angular.module('clean-code.dashboard', []);
@@ -39,6 +29,16 @@
   })
 })();
 (function() {
+  "use strict";
+
+  angular.module('clean-code.core', [
+    /*
+     * Angular modules
+     */
+    'ngAnimate', 'ui.router'
+  ])
+})();
+(function() {
   'use strict';
 
   angular.module('clean-code',
@@ -49,25 +49,74 @@
 (function() {
   "use strict";
   function AvengersController(avengers) {
-    this._avengers = avengers;
-    this.avengers = [];
-    this.title = 'Avengers';
+    var vm = this;
+    vm.avengers = [];
+    vm.title = 'Avengers';
 
+    _init();
 
-    this._init();
+    function _init() {
+      return getAvengers().then(function() {
+        //do something
+      });
+    }
+
+    function getAvengers() {
+      avengers.getAvengers().then(function(data) {
+        vm.avengers = data.data[0].data.results;
+        return vm.avengers;
+      })
+    }
   }
-
-  AvengersController.prototype._init = function() {
-    this._avengers.getAvengers().then(function(data) {
-      this.avengers = data.data[0].data.results;
-    }.bind(this))
-  };
 
   AvengersController.$inject =['avengers'];
 
   angular.module('clean-code.avengers')
     .controller('AvengersController', AvengersController)
 })();
+(function() {
+  'use strict';
+
+  function DashboardController($q, avengers) {
+    var vm = this;
+    vm.news = {
+      title: 'Marvel Avengers',
+      description: 'Marvel Avengers 2 is now in production!'
+    };
+    vm.avengerCount = 0;
+    vm.avengers = [];
+    vm.title = 'Dashboard';
+
+    _init();
+
+    function _init() {
+      var promises = [getAvengersCast, getAvengersCount];
+      return $q.all(promises).then(function() {
+        //data is loaded;
+      })
+    }
+
+    function getAvengersCount() {
+      return avengers.getAvengersCount().then(function(data) {
+        vm.avengerCount = data;
+        return vm.avengerCount;
+      });
+    }
+
+    function getAvengersCast() {
+      return avengers.getAvengersCast().then(function(data) {
+        vm.avengers = data;
+        return vm.avengers;
+      });
+    }
+  }
+
+  DashboardController.$inject = ['$q', 'avengers'];
+  angular
+    .module('clean-code.dashboard')
+    .controller('DashboardController', DashboardController);
+})();
+
 (function() {
 
   function avengers(rest, $q) {
@@ -135,35 +184,3 @@
   angular.module('clean-code.core')
     .factory('rest', Rest);
 }());
-(function() {
-  'use strict';
-
-  function DashboardController(avengers) {
-    this._avengers = avengers;
-    this.news = {
-      title: 'Marvel Avengers',
-      description: 'Marvel Avengers 2 is now in production!'
-    };
-    this.avengerCount = 0;
-    this.avengers = [];
-    this.title = 'Dashboard';
-
-   this. _init();
-
-
-  }
-
-  DashboardController.prototype._init = function() {
-    this._avengers.getAvengersCount().then(function(data) {
-      this.avengerCount = data;
-    }.bind(this));
-
-    this._avengers.getAvengersCast().then(function(data) {
-      this.avengers = data;
-    }.bind(this));
-  };
-  DashboardController.$inject = ['avengers'];
-  angular
-    .module('clean-code.dashboard')
-    .controller('DashboardController', DashboardController);
-})();

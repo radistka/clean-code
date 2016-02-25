@@ -53,6 +53,8 @@ report/
 *.xap
 *.zip
 
+frontend/build
+
 # Logs and databases #
 ######################
 *.log
