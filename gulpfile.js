@@ -16,6 +16,7 @@ var paths = {
   fonts: 'frontend/src/fonts/*.{otf,eot,svg,ttf,woff,woff2}',
   scripts: {
     app: [
+      'frontend/src/app/**/*.module.js',
       'frontend/src/*.js',
       'frontend/src/app/**/*.js'
     ],

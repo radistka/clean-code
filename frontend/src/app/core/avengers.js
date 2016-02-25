@@ -42,6 +42,6 @@
 
   avengers.$inject = ['rest', '$q'];
 
-  angular.module('clean-code')
+  angular.module('clean-code.core')
     .factory('avengers', avengers)
 })();

@@ -1,10 +1,34 @@
 (function() {
+  "use strict";
+
+  var avengers = angular.module('clean-code.avengers', []);
+
+  avengers.config(function($stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise('/');
+    $stateProvider
+      .state('avengers', {
+        url: '/avengers',
+        templateUrl: 'avengers/avengers.html',
+        controller: 'AvengersController as avengersController'
+      })
+  });
+})();
+(function() {
+  "use strict";
+
+  angular.module('clean-code.core', [
+    /*
+     * Angular modules
+     */
+    'ngAnimate', 'ui.router'
+  ])
+})();
+(function() {
   'use strict';
 
-  var app = angular.module('clean-code', ['ngAnimate', 'ui.router', 'ngSanitize', 'ngplus']);
+  var dashboard = angular.module('clean-code.dashboard', []);
 
-  app.config(function($stateProvider, $urlRouterProvider) {
-
+  dashboard.config(function($stateProvider, $urlRouterProvider) {
     $urlRouterProvider.otherwise('/');
     $stateProvider
       .state('dashboard', {
@@ -12,12 +36,14 @@
         templateUrl: 'dashboard/dashboard.html',
         controller: 'DashboardController as dashboardController'
       })
-      .state('avengers', {
-        url: '/avengers',
-        templateUrl: 'avengers/avengers.html',
-        controller: 'AvengersController as avengersController'
-      })
   })
+})();
+(function() {
+  'use strict';
+
+  angular.module('clean-code',
+    ['clean-code.core',
+      'clean-code.dashboard', 'clean-code.avengers']);
 })();
 
 (function() {
@@ -33,49 +59,15 @@
 
   AvengersController.prototype._init = function() {
     this._avengers.getAvengers().then(function(data) {
-      console.log(data);
       this.avengers = data.data[0].data.results;
     }.bind(this))
   };
 
   AvengersController.$inject =['avengers'];
 
-  angular.module('clean-code')
+  angular.module('clean-code.avengers')
     .controller('AvengersController', AvengersController)
 })();
-(function() {
-  'use strict';
-
-  function DashboardController(avengers) {
-    this._avengers = avengers;
-    this.news = {
-      title: 'Marvel Avengers',
-      description: 'Marvel Avengers 2 is now in production!'
-    };
-    this.avengerCount = 0;
-    this.avengers = [];
-    this.title = 'Dashboard';
-
-   this. _init();
-
-
-  }
-
-  DashboardController.prototype._init = function() {
-    this._avengers.getAvengersCount().then(function(data) {
-      this.avengerCount = data;
-    }.bind(this));
-
-    this._avengers.getAvengersCast().then(function(data) {
-      this.avengers = data;
-    }.bind(this));
-  };
-  DashboardController.$inject = ['avengers'];
-  angular
-    .module('clean-code')
-    .controller('DashboardController', DashboardController);
-})();
-
 (function() {
 
   function avengers(rest, $q) {
@@ -120,7 +112,7 @@
 
   avengers.$inject = ['rest', '$q'];
 
-  angular.module('clean-code')
+  angular.module('clean-code.core')
     .factory('avengers', avengers)
 })();
 'use strict';
@@ -140,6 +132,38 @@
 
   Rest.$inject = ['$http'];
 
-  angular.module('clean-code')
+  angular.module('clean-code.core')
     .factory('rest', Rest);
 }());
+(function() {
+  'use strict';
+
+  function DashboardController(avengers) {
+    this._avengers = avengers;
+    this.news = {
+      title: 'Marvel Avengers',
+      description: 'Marvel Avengers 2 is now in production!'
+    };
+    this.avengerCount = 0;
+    this.avengers = [];
+    this.title = 'Dashboard';
+
+   this. _init();
+
+
+  }
+
+  DashboardController.prototype._init = function() {
+    this._avengers.getAvengersCount().then(function(data) {
+      this.avengerCount = data;
+    }.bind(this));
+
+    this._avengers.getAvengersCast().then(function(data) {
+      this.avengers = data;
+    }.bind(this));
+  };
+  DashboardController.$inject = ['avengers'];
+  angular
+    .module('clean-code.dashboard')
+    .controller('DashboardController', DashboardController);
+})();

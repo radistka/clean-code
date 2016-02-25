@@ -15,6 +15,6 @@
 
   Rest.$inject = ['$http'];
 
-  angular.module('clean-code')
+  angular.module('clean-code.core')
     .factory('rest', Rest);
 }());

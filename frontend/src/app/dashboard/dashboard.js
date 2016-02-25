@@ -27,6 +27,6 @@
   };
   DashboardController.$inject = ['avengers'];
   angular
-    .module('clean-code')
+    .module('clean-code.dashboard')
     .controller('DashboardController', DashboardController);
 })();
