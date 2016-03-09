@@ -3,8 +3,7 @@
 
   var avengers = angular.module('clean-code.avengers', []);
 
-  avengers.config(function($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/');
+  avengers.config(function($stateProvider) {
     $stateProvider
       .state('avengers', {
         url: '/avengers',

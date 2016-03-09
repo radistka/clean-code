@@ -3,8 +3,7 @@
 
   var avengers = angular.module('clean-code.avengers', []);
 
-  avengers.config(function($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/');
+  avengers.config(function($stateProvider) {
     $stateProvider
       .state('avengers', {
         url: '/avengers',
@@ -12,6 +11,21 @@
         controller: 'AvengersController as avengersController'
       })
   });
+})();
+(function() {
+  'use strict';
+
+  var dashboard = angular.module('clean-code.dashboard', []);
+
+  dashboard.config(function($stateProvider) {
+    console.log('dashboard module');
+    $stateProvider
+      .state('dashboard', {
+        url: '/',
+        templateUrl: 'dashboard/dashboard.html',
+        controller: 'DashboardController as dashboardController'
+      })
+  })
 })();
 (function() {
   "use strict";
@@ -28,19 +42,9 @@
   ])
 })();
 (function() {
-  'use strict';
+  "use strict";
 
-  var dashboard = angular.module('clean-code.dashboard', []);
-
-  dashboard.config(function($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/');
-    $stateProvider
-      .state('dashboard', {
-        url: '/',
-        templateUrl: 'dashboard/dashboard.html',
-        controller: 'DashboardController as dashboardController'
-      })
-  })
+  angular.module('blocks.exception', ['blocks.logger']);
 })();
 (function() {
   "use strict";
@@ -48,16 +52,17 @@
   angular.module('blocks.logger', [])
 })();
 (function() {
-  "use strict";
-
-  angular.module('blocks.exception', ['blocks.logger']);
-})();
-(function() {
   'use strict';
 
-  angular.module('clean-code',
+  var app = angular.module('clean-code',
     ['clean-code.core',
-      'clean-code.dashboard', 'clean-code.avengers']);
+      'clean-code.dashboard', 'clean-code.avengers', 'clean-code.layout']);
+
+  app.config(function($urlRouterProvider) {
+    console.log('app');
+    $urlRouterProvider.otherwise('/');
+  });
+  app.run(function($state){});//fixed issue with ui-view inside ng-include
 })();
 
 (function() {
@@ -90,6 +95,51 @@
     }
   }
 })();
+(function() {
+  'use strict';
+
+  angular
+    .module('clean-code.dashboard')
+    .controller('DashboardController', DashboardController);
+
+  DashboardController.$inject = ['$q', 'avengers', 'logger'];
+
+  function DashboardController($q, avengers, logger) {
+    var vm = this;
+    vm.news = {
+      title: 'Marvel Avengers',
+      description: 'Marvel Avengers 2 is now in production!'
+    };
+    vm.avengerCount = 0;
+    vm.avengers = [];
+    vm.title = 'Dashboard';
+
+    _init();
+
+    function _init() {
+      var promises = [getAvengersCast(), getAvengersCount()];
+      return $q.all(promises).then(function() {
+        //data is loaded;
+        logger.info('Activated Dashboard View');
+      })
+    }
+
+    function getAvengersCount() {
+      return avengers.getAvengersCount().then(function(data) {
+        vm.avengerCount = data;
+        return vm.avengerCount;
+      });
+    }
+
+    function getAvengersCast() {
+      return avengers.getAvengersCast().then(function(data) {
+        vm.avengers = data;
+        return vm.avengers;
+      });
+    }
+  }
+})();
+
 (function() {
 
   angular.module('clean-code.core')
@@ -152,6 +202,26 @@
 
 })();
 (function() {
+  'use strict';
+
+  var core = angular.module('clean-code.core');
+
+  core.config(toastrConfig);
+
+  toastrConfig.$inject = ['toastr'];
+  function toastrConfig(toastr) {
+    toastr.options.timeOut = 4000;
+    toastr.options.positionClass = 'toast-bottom-right';
+  }
+
+  var config = {
+    appTitle: 'Angular Modular Demo',
+    version: '1.0.0'
+  };
+
+  core.value('config', config);
+})();
+(function() {
   "use strict";
 
   angular
@@ -185,50 +255,49 @@
   }
 }());
 (function() {
-  'use strict';
+  "use strict";
+
+  angular.module('clean-code.layout', [])
+})();
+(function() {
+  "use strict";
 
   angular
-    .module('clean-code.dashboard')
-    .controller('DashboardController', DashboardController);
+    .module('clean-code.layout')
+    .controller('Shell', Shell);
 
-  DashboardController.$inject = ['$q', 'avengers', 'logger'];
+  Shell.$inject = ['config', 'logger'];
 
-  function DashboardController($q, avengers, logger) {
+  function Shell(config, logger) {
     var vm = this;
-    vm.news = {
-      title: 'Marvel Avengers',
-      description: 'Marvel Avengers 2 is now in production!'
-    };
-    vm.avengerCount = 0;
-    vm.avengers = [];
-    vm.title = 'Dashboard';
+    vm.title = config.appTitle;
 
     _init();
 
     function _init() {
-      var promises = [getAvengersCast(), getAvengersCount()];
-      return $q.all(promises).then(function() {
-        //data is loaded;
-        logger.info('Activated Dashboard View');
-      })
-    }
-
-    function getAvengersCount() {
-      return avengers.getAvengersCount().then(function(data) {
-        vm.avengerCount = data;
-        return vm.avengerCount;
-      });
-    }
-
-    function getAvengersCast() {
-      return avengers.getAvengersCast().then(function(data) {
-        vm.avengers = data;
-        return vm.avengers;
-      });
+      logger.success(config.appTitle + 'loaded!', null);
     }
   }
 })();
+(function() {
+  "use strict";
 
+  angular
+    .module('blocks.exception')
+    .factory('exception', exception);
+
+  exception.$inject = ['logger'];
+
+  function exception(logger) {
+    return {
+      catcher: catcher
+    };
+
+    function catcher(message, reason) {
+      return logger.error(message, reason);
+    }
+  }
+})();
 (function() {
   "use strict";
 
@@ -240,12 +309,10 @@
 
   function logger($log, toastr) {
     return {
-      showToasts: true,
       error: error,
       info: info,
       success: success,
-      warning: warning,
-      log: $log.log
+      warning: warning
     };
 
     function error(message, data, title) {
@@ -266,25 +333,6 @@
     function warning(message, data, title) {
       toastr.warning(message, title);
       $log.warn('Warning: ' + message, data);
-    }
-  }
-})();
-(function() {
-  "use strict";
-
-  angular
-    .module('blocks.exception')
-    .factory('exception', exception);
-
-  exception.$inject = ['logger'];
-
-  function exception(logger) {
-    return {
-      catcher: catcher
-    };
-
-    function catcher(message, reason) {
-      return logger.error(message, reason);
     }
   }
 })();

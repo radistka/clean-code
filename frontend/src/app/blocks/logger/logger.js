@@ -9,12 +9,10 @@
 
   function logger($log, toastr) {
     return {
-      showToasts: true,
       error: error,
       info: info,
       success: success,
-      warning: warning,
-      log: $log.log
+      warning: warning
     };
 
     function error(message, data, title) {

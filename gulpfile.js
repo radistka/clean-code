@@ -9,7 +9,10 @@ var minifyCss = require('gulp-minify-css');
 var inject = require('gulp-inject');
 
 var paths = {
-  html: 'frontend/src/index.html',
+  html: [
+    'frontend/src/index.html',
+    'frontend/src/**/*.html'
+    ],
   templates: 'frontend/src/app/**/**/*.html',
   icon: 'frontend/src/favicon.ico',
   images: 'frontend/src/imgs/**/*.{png,jpg,jpeg,gif,webp,svg}',
